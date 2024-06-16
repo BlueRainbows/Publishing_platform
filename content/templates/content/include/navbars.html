@@ -63,11 +63,14 @@
                                 Подписка <u>преобретается единоразово</u>, в подписку входит расширенный функционал, такой как:<br>
                                 ♥ Статистика ваших постов <br>
                                 ♥ Просмотр понравившихся постов <br>
-
                             </div>
                             <div class="modal-footer">
                                 {% if user.is_authenticated %}
+                                    {% if user.subscription %}
+                                    <a class="btn d-grid gap-2 col-5 mx-auto btn-block" style="background-color: #ccb5eb" href="#">Спасибо за подписку</a>
+                                    {% else %}
                                     <a class="btn d-grid gap-2 col-5 mx-auto btn-block" style="background-color: #ccb5eb" href="{% url 'users:subscription' %}">Преобрести</a>
+                                    {% endif  %}
                                 {% else %}
                                     <a class="btn d-grid gap-2 col-5 mx-auto btn-block" style="background-color: #ccb5eb" href="{% url 'users:register' %}">Преобрести</a>
                                 {% endif %}

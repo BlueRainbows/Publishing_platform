@@ -150,3 +150,6 @@ LOGIN_URL = ''
 
 # Ключ от stripe
 SECRET_KEY_STRIPE = os.getenv('SECRET_KEY_STRIPE')
+
+# Адрес перехода при успешной оплате в страйпе
+HTTP_SUCCESS = os.getenv('HTTP_SUCCESS')

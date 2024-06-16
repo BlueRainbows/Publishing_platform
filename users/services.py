@@ -1,5 +1,5 @@
 import stripe
-from config.settings import SECRET_KEY_STRIPE
+from config.settings import SECRET_KEY_STRIPE, HTTP_SUCCESS
 
 st = stripe.api_key = SECRET_KEY_STRIPE
 
@@ -25,7 +25,7 @@ def create_price(product):
 
 def create_session(price):
     session = stripe.checkout.Session.create(
-        success_url="http://127.0.0.1:8000/subscription_info/",
+        success_url=HTTP_SUCCESS + "/subscription_info/",
         line_items=[{"price": price.get("id"), "quantity": 1}],
         mode="payment",
     )
