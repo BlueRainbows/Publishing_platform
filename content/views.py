@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
@@ -21,7 +21,9 @@ class ContentCreateView(generic.CreateView):
     def form_valid(self, form):
         """
         Метод при успешном создании.
+        Если пользователь авторизован -
         Добавляет текущего пользователя при создании объекта.
+        Меняет флаг публикации на положительный.
         """
         if form.is_valid():
             new_content = form.save(commit=False)
@@ -52,7 +54,10 @@ class ContentDetailView(generic.DetailView):
         return self.object
 
     def get_context_data(self, **kwargs):
-        """ Метод добавляет дополнительные поля: лайки и комментарии """
+        """
+        Метод добавляет отображение дополнительных полей:
+        Лайки и комментарии.
+        """
         context = super().get_context_data(**kwargs)
         context['like'] = LikeCount.objects.filter(content__pk=self.object.pk).count()
         context['comments'] = Comment.objects.filter(content__pk=self.object.pk)
@@ -62,7 +67,7 @@ class ContentDetailView(generic.DetailView):
 
 class ContentManagerListView(generic.ListView):
     """
-    Контроллер для главной страницы.
+    Контроллер для страницы менеджеров.
     Примимает модель Content.
     """
     model = Content
@@ -71,7 +76,10 @@ class ContentManagerListView(generic.ListView):
     def get_queryset(self, *args, **kwargs):
         """
         Метод выполняющий фильтрацию по наличию публикации.
-        Выводит на главную страницу только те блоги, которые имеют положительный признак публикации(True)
+        Выводит на страницу только те посты,
+        Которые имеют отрицательныйпризнак публикации(False).
+        Перекрывает доступ пользователям без прав на изменение публикации
+        И не авторизованным пользователям.
         """
         queryset = super().get_queryset(*args, **kwargs)
         if not self.request.user.is_authenticated or not self.request.user.has_perm('content.change_publish'):
@@ -81,10 +89,9 @@ class ContentManagerListView(generic.ListView):
             return queryset
 
 
-
 class ContentPersonalListView(generic.ListView):
     """
-    Контроллер для главной страницы.
+    Контроллер для страницы личных постов.
     Примимает модель Content.
     """
     model = Content
@@ -92,8 +99,7 @@ class ContentPersonalListView(generic.ListView):
 
     def get_queryset(self, *args, **kwargs):
         """
-        Метод выполняющий фильтрацию по наличию публикации.
-        Выводит на главную страницу только те блоги, которые имеют положительный признак публикации(True)
+        Метод выполняющий фильтрацию по текущему пользователю.
         """
         queryset = super().get_queryset(*args, **kwargs)
         queryset = queryset.filter(user=self.request.user)
@@ -111,7 +117,9 @@ class ContentListView(generic.ListView):
     def get_queryset(self, *args, **kwargs):
         """
         Метод выполняющий фильтрацию по наличию публикации.
-        Выводит на главную страницу только те блоги, которые имеют положительный признак публикации(True)
+        Выводит на главную страницу только те посты,
+        Которые имеют положительный признак публикации(True).
+        Добавляет поле маркера лайка.
         """
         queryset = super().get_queryset(*args, **kwargs)
         queryset = queryset.filter(publish=True)
@@ -129,15 +137,33 @@ class ContentUpdateView(LoginRequiredMixin, generic.UpdateView):
     """
     model = Content
     form_class = ContentForm
-    success_url = reverse_lazy('content:personal_list')
 
     def get_form_class(self):
+        """
+        Метод возвращает форму ContentForm,
+        Если пользователь является автором поста.
+        Если у пользователя есть права на изменение поста,
+        То возвращает форму ManagerContentForm.
+        """
         if self.request.user == self.get_object().user:
             return ContentForm
         elif self.request.user.has_perm('content.change_publish'):
             return ManagerContentForm
         else:
             return ContentForm
+
+    def get_success_url(self):
+        """
+        Метод возвращает адрес страницы при успешном изменении поста.
+        Если пользователь является автором поста,
+        Перенаправляет на страницу личных постов.
+        Если пользователь имеет права на изменение поста,
+        Перенаправляет на страницу менеджеров.
+        """
+        if self.request.user == self.get_object().user:
+            return reverse('content:personal_list')
+        elif self.request.user.has_perm('content.change_publish'):
+            return reverse('content:manager_list')
 
 
 class ContentDeleteView(LoginRequiredMixin, generic.DeleteView):
@@ -172,6 +198,11 @@ def likes(request, pk):
 
 
 def comments(request, pk):
+    """"
+    Функция для добавления комментариев в базу данных.
+    Доступна только для авторизованных пользователей.
+    Принимает текст комментария и создает модель Comment.
+    """
     if not request.user.is_authenticated:
         raise PermissionDenied
     if request.method == "POST":

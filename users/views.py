@@ -13,9 +13,14 @@ from users.services import create_price, create_session, create_product
 
 
 def get_subscription(request):
-    """ Функция для создания сессии подписки и редиректа на страницу платежа """
+    """
+    Функция для создания сессии подписки.
+    Доступна для авторизованных пользователей,
+    Не имеющих подписку.
+    Редирект на страницу платежа.
+     """
     if request.method == 'GET':
-        if request.user.is_authenticated:
+        if not request.user.is_authenticated:
             raise PermissionDenied
         if request.user.subscription:
             raise PermissionDenied
@@ -47,9 +52,8 @@ class RegisterView(CreateView):
 
 class ProfileView(LoginRequiredMixin, DetailView):
     """
-    Контроллер для изменения профиля пользователя.
-    Модель User, форма UserRegisterForm.
-    При успешном изменении переходит на себя.
+    Контроллер профиля пользователя.
+    Модель User.
     """
     model = User
     template_name = 'users/profile.html'
@@ -62,6 +66,9 @@ class ProfileView(LoginRequiredMixin, DetailView):
 
 
 class UserLoginView(LoginView):
+    """
+    Контроллер для авторизации пользователя.
+    """
     model = User
     form_class = UserLoginForm
     template_name = 'users/login.html'
@@ -87,6 +94,9 @@ class ChangeProfileView(LoginRequiredMixin, UpdateView):
 
 
 class UserDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Контроллер для удаления пользователя.
+    """
     model = User
     success_url = reverse_lazy('content:index')
 
