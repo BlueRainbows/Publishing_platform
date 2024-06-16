@@ -1,0 +1,29 @@
+{% extends 'content/base.html' %}
+{% block content %}
+<div class="container">
+    <form method="post" enctype="multipart/form-data">
+        <div class="col-12">
+            <div class="row g-3 align-items-center">
+                <div class="col-3">
+                </div>
+                <div class="col-sm-6 mb-3 mb-sm-0">
+                    <div class="card mb-3 mt-4 box-shadow">
+                        <div class="card-header text-center mb-3">
+                            <h4 class="my-0 font-weight-normal mb-3 mt-2">Профиль</h4>
+                        </div>
+                        <div class="card-body">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn d-grid gap-2 col-5 mx-auto btn-block" style="background-color: #ccb5eb">
+                                Сохранить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

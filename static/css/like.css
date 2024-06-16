@@ -1,0 +1,6 @@
+.btn-like-active .heart-inactive {
+    display: none;
+}
+.btn-like-inactive .heart-active {
+    display: none;
+}

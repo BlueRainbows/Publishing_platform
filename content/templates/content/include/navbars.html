@@ -1,0 +1,92 @@
+{% load tags_and_filter %}
+<div class="container">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/" style="font-size: 3.0rem;">Skystore</a>
+        <div class="collapse navbar-collapse" >
+          <ul class="navbar-nav me-auto mt-3 navbar-nav-scroll" >
+            {% if user.is_authenticated  %}
+                <li class="nav-item">
+                  <img src="{{ user.avatar|mymedia }}" alt="" width="50" height="50" class="rounded-circle me-2">
+                </li>
+            {% endif %}
+            <li class="nav-item dropdown mt-2">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Профиль
+              </a>
+              <ul class="dropdown-menu">
+                {% if user.is_authenticated %}
+                    <li>
+                      <form method="post" enctype="multipart/form-data"
+                            action="{% url 'users:logout' %}">
+                        {% csrf_token %}
+                        <button class="dropdown-item" type="submit">Выйти из профиля</button>
+                      </form>
+                    </li>
+                    <li><a class="dropdown-item" href="{% url 'users:profile' %}">Посмотреть профиль</a></li>
+                    <li><a class="dropdown-item" href="#">Проверить статистику</a></li>
+                {% else %}
+                    <li>
+                      <a class="dropdown-item" href="{% url 'users:login' %}">Войти в профиль</a>
+                      <a class="dropdown-item" href="{% url 'users:register' %}">Регистрация</a>
+                    </li>
+                {% endif %}
+              </ul>
+            </li>
+            <li class="nav-item dropdown mt-2">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Пост
+              </a>
+              <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Информация о размещении контента</a></li>
+                  <li><a class="dropdown-item" href="{% url 'content:create' %}">Создать новый пост</a></li>
+                  {% if user.is_authenticated %}
+                    <li><a class="dropdown-item" href="{% url 'content:personal_list' %}">Посмотреть мои посты</a></li>
+                  {% endif %}
+              </ul>
+            </li>
+            <li class="nav-item mt-2">
+                <button type="button" class="nav-link" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    О подписке
+                </button>
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Информация о подписке</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Чтобы преобрести подписку, вам <u>необходимо зарегистрироваться</u> на нашей платформе.
+                                Подписка <u>преобретается единоразово</u>, в подписку входит расширенный функционал, такой как:<br>
+                                ♥ Статистика ваших постов <br>
+                                ♥ Просмотр понравившихся постов <br>
+
+                            </div>
+                            <div class="modal-footer">
+                                {% if user.is_authenticated %}
+                                    <a class="btn d-grid gap-2 col-5 mx-auto btn-block" style="background-color: #ccb5eb" href="{% url 'users:subscription' %}">Преобрести</a>
+                                {% else %}
+                                    <a class="btn d-grid gap-2 col-5 mx-auto btn-block" style="background-color: #ccb5eb" href="{% url 'users:register' %}">Преобрести</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% if perms.content.change_publish %}
+                <li class="nav-item mt-2">
+                   <a class="nav-link" href="{% url 'content:manager_list' %}">Для менеджеров</a>
+                </li>
+            {% endif %}
+          </ul>
+          <form class="d-flex" role="search">
+            <input class="form-control me-2 mt-4" type="search" placeholder="Поиск в ленте" aria-label="Search">
+            <button class="btn btn-outline-success mt-4" type="submit">Найти</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+</div>

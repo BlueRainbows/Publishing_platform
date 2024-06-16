@@ -1,0 +1,91 @@
+{% extends 'content/base.html' %}
+{% block content %}
+{% load tags_and_filter %}
+<div class="col-12">
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6">
+            <div class="card mb-3 mt-4 box-shadow">
+                <div class="card-body">
+                    <img class="img-thumbnail rounded mx-auto d-block" style="max-width: 50%"
+                         src="{{ object.image | mymedia }}">
+                    <table class="table mt-4">
+                        <thead class="table-dark">
+                        <tr>
+                            <th colspan="10" class="text-center display-6">{{ object.title }}</th>
+                        </tr>
+                        <tr>
+                            <th colspan="10" class="table table-hover text-title"><em>{{ object.text }}</em></th>
+                        </tr>
+                        </thead>
+                        <thead>
+                        <tr>
+                            <th class="lead text-body-secondary" scope="col">Дата публикации</th>
+                            <th class="lead text-body-secondary" scope="col">Количество просмотров</th>
+                            <th class="lead text-body-secondary" scope="col">Лайки</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{{ object.created_at }}</td>
+                            <td>{{ object.views }}</td>
+                            <td>{{ like }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    {% if user.is_authenticated %}
+                    <div class="card-body">
+                        <form class="form-inline my-2 my-lg-0" action="{% url 'content:comments' object.pk %}"
+                              method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="exampleFormControlTextarea1" class="form-label">Оставить комментарий</label>
+                                <input class="form-control" name="comment" id="exampleFormControlTextarea1" type="text"
+                                       value=""><br>
+                                <input type="submit" class="btn mt-3" style="background-color: #ccb5eb"
+                                       value="Написать комментарий">
+                            </div>
+                        </form>
+                    </div>
+                    <hr>
+                    <div class="accordion accordion-flush mb-4" id="accordionFlushExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                        aria-controls="flush-collapseOne">
+                                    Посмотреть комментарии
+                                </button>
+                            </h2>
+                            <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                 data-bs-parent="#accordionFlushExample">
+                                {% for comment in comments %}
+                                <div class="accordion-body">
+                                    <p>{{ comment.comment }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bth-group text-center">
+                        {% if object.user.id == user.id %}
+                        <a href="{% url 'content:personal_list' %}" class="btn" style="background-color: #e2c6f7">Посмотреть
+                            свои посты</a>
+                        <a href="{% url 'content:index' %}" class="btn" style="background-color: #e2c6f7">Вернуться к
+                            постам</a>
+                        {% else %}
+                        <a href="{% url 'content:index' %}" class="btn" style="background-color: #e2c6f7">Вернуться к
+                            постам</a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'content:index' %}" class="btn" style="background-color: #e2c6f7">Вернуться к
+                            постам</a>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3"></div>
+    </div>
+</div>
+{% endblock %}
