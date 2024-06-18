@@ -146,7 +146,7 @@ LOGIN_REDIRECT_URL = '/'
 # редирект при выходе
 LOGOUT_REDIRECT_URL = '/'
 # редирект анонимного пользователя
-LOGIN_URL = ''
+LOGIN_URL = '/'
 
 # Ключ от stripe
 SECRET_KEY_STRIPE = os.getenv('SECRET_KEY_STRIPE')

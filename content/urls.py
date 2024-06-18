@@ -24,4 +24,8 @@ urlpatterns = [
     path('comments/<int:pk>/', views.comments, name='comments'),
     # Не опубликованные посты пользователей
     path('manager_list/', views.ContentManagerListView.as_view(), name='manager_list'),
+    # Просмотр статистики постов пользователя
+    path('statistics/', views.get_statistics, name='statistics'),
+    # Поиск контента
+    path('search/', views.get_search_content, name='search'),
 ]

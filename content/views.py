@@ -1,11 +1,52 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 
 from content.forms import ContentForm, ManagerContentForm
 from content.models import Content, LikeCount, Comment
+
+
+def get_search_content(request):
+    """
+    Функция для осуществления поиска по запросу пользователя.
+    Принимает текст запроса и ищет его в заголовке или описании.
+    """
+    if request.method == "POST":
+        search = request.POST.get("search", None)
+        search_content_text = Content.objects.filter(text__icontains=search)
+        if search_content_text:
+            return render(request, 'content/searchcontent_list.html',
+                          {'search_content_text': search_content_text})
+        else:
+            search_content_text = Content.objects.filter(title__icontains=search)
+            return render(request, 'content/searchcontent_list.html',
+                          {'search_content_text': search_content_text})
+
+
+def get_statistics(request):
+    """
+    Функция для подсчёта статистики постов пользователя.
+    Возвращает словарь с объектами статистики.
+    """
+    # Получаем количество всех постов пользователя
+    post_all = Content.objects.filter(user=request.user).count()
+    # Получаем пост с самым высоким колличеством просмотров
+    filter_views = Content.objects.filter(user=request.user).order_by('-views').first()
+    # Получаем пост с самым большим колличеством лайков
+    pk_post = 0
+    count_likes = 0
+    content_filter = Content.objects.filter(user=request.user)
+    for content_pk in content_filter:
+        like_filter = LikeCount.objects.filter(content__pk=content_pk.pk).count()
+        if count_likes <= like_filter:
+            count_likes = like_filter
+            pk_post = content_pk.pk
+    max_likes = Content.objects.get(pk=pk_post)
+
+    return render(request, 'content/statistics.html',
+                  {'post_all': post_all, 'post_views': filter_views, 'post_likes': max_likes})
 
 
 class ContentCreateView(generic.CreateView):
@@ -174,6 +215,16 @@ class ContentDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Content
     success_url = reverse_lazy('content:personal_list')
 
+    def get_object(self, queryset=None):
+        """
+        Метод при удалении объекта.
+        Выводит ошибку если пользователь не является автором поста,
+        Или не авторизовался в системе.
+        """
+        self.object = super().get_object(queryset)
+        if not self.request.user.is_authenticated or self.request.user != self.object.user:
+            raise PermissionDenied
+
 
 def likes(request, pk):
     """
@@ -188,12 +239,11 @@ def likes(request, pk):
     """
     if not request.user.is_authenticated:
         raise PermissionDenied
-    content_item = get_object_or_404(Content, pk=pk)
-    filter_like = LikeCount.objects.filter(content__pk=content_item.pk).filter(user__pk=request.user.pk).exists()
+    filter_like = LikeCount.objects.filter(content__pk=pk, user__pk=request.user.pk).exists()
     if filter_like:
-        LikeCount.objects.filter(content__pk=content_item.pk).filter(user__pk=request.user.pk).delete()
+        LikeCount.objects.filter(content__pk=pk).filter(user__pk=request.user.pk).delete()
     else:
-        LikeCount.objects.create(user=request.user, content=content_item)
+        LikeCount.objects.create(user=request.user, content=Content.objects.get(pk=pk))
     return redirect(reverse('content:index'))
 
 
@@ -207,10 +257,9 @@ def comments(request, pk):
         raise PermissionDenied
     if request.method == "POST":
         comment = request.POST.get("comment", None)
-        cont = Content.objects.get(pk=pk)
         Comment.objects.create(
             user=request.user,
-            content=cont,
+            content=Content.objects.get(pk=pk),
             comment=comment
         )
         return redirect(reverse('content:detail', kwargs={'pk': pk}))

@@ -65,7 +65,8 @@
                                         <div class="card-body">
                                             <img src="{{ comment.user.avatar|mymedia }}" alt="" width="32" height="32"
                                             class="rounded-circle">
-                                            {{ comment.user.first_name }} {{ comment.user.last_name }}
+                                            {{ comment.user.first_name }} {{ comment.user.last_name }}<br>
+                                            <strong>{{ comment.created_at }}</strong>
                                         </div>
                                         <div class="card-footer">
                                             <p>{{ comment.comment }}</p>

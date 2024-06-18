@@ -24,7 +24,7 @@
                       </form>
                     </li>
                     <li><a class="dropdown-item" href="{% url 'users:profile' %}">Посмотреть профиль</a></li>
-                    <li><a class="dropdown-item" href="#">Проверить статистику</a></li>
+                    <li><a class="dropdown-item" href="{% url 'content:statistics' %}">Проверить статистику</a></li>
                 {% else %}
                     <li>
                       <a class="dropdown-item" href="{% url 'users:login' %}">Войти в профиль</a>
@@ -85,9 +85,10 @@
                 </li>
             {% endif %}
           </ul>
-          <form class="d-flex" role="search">
-            <input class="form-control me-2 mt-4" type="search" placeholder="Поиск в ленте" aria-label="Search">
-            <button class="btn btn-outline-success mt-4" type="submit">Найти</button>
+          <form class="d-flex" action="{% url 'content:search' %}" method="post">
+              {% csrf_token %}
+              <input class="form-control me-2 mt-4" name="search" type="text" placeholder="Поиск в ленте">
+              <button class="btn btn-outline-success mt-4" type="submit">Найти</button>
           </form>
         </div>
       </div>

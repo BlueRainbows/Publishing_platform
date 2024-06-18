@@ -22,25 +22,17 @@ class Content(models.Model):
         upload_to='content/',
         verbose_name='Изображение'
     )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Дата создания'
-    )
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        verbose_name='Дата обновления'
-    )
     publish = models.BooleanField(
         default=False,
         verbose_name='Опубликовано'
     )
+    created_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Дата создания поста'
+    )
     views = models.PositiveIntegerField(
         default=0,
         verbose_name='Просмотры'
-    )
-    subscribers = models.PositiveIntegerField(
-        default=0,
-        verbose_name='Подписчики'
     )
 
     def __str__(self):
