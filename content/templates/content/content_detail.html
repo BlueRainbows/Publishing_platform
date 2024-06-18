@@ -61,7 +61,16 @@
                                  data-bs-parent="#accordionFlushExample">
                                 {% for comment in comments %}
                                 <div class="accordion-body">
-                                    <p>{{ comment.comment }}</p>
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <img src="{{ comment.user.avatar|mymedia }}" alt="" width="32" height="32"
+                                            class="rounded-circle">
+                                            {{ comment.user.first_name }} {{ comment.user.last_name }}
+                                        </div>
+                                        <div class="card-footer">
+                                            <p>{{ comment.comment }}</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 {% endfor %}
                             </div>
