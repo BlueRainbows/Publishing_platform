@@ -7,7 +7,8 @@
         <div class="col-6">
             <div class="card mb-3 mt-4 box-shadow">
                 <div class="card-body">
-                    <img class="img-thumbnail rounded mx-auto d-block" style="max-width: 50%" src="{{ object.avatar | mymedia }}">
+                    <img class="img-thumbnail rounded mx-auto d-block" style="max-width: 50%"
+                         src="{{ object.avatar | mymedia }}">
                 </div>
             </div>
             <div class="card">
@@ -19,7 +20,8 @@
             </div>
             <div class="bth-group text-center mt-4">
                 <a href="{% url 'content:index' %}" class="btn" style="background-color: #e2c6f7">Вернуться к постам</a>
-                <a href="{% url 'users:change_profile' %}" class="btn" style="background-color: #e2c6f7">Изменить профиль</a>
+                <a href="{% url 'users:change_profile' %}" class="btn" style="background-color: #e2c6f7">Изменить
+                    профиль</a>
                 <a href="{% url 'users:user_delete'%}" class="btn" style="background-color: #e2c6f7">Удалить профиль</a>
             </div>
         </div>

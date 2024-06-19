@@ -56,8 +56,10 @@ def get_verification(request, user):
     user.save()
     current_site = get_current_site(request)
     send_mail(
-        subject=f'Здравствуйте {user.first_name}! Теперь вы зарегистрированы на нашем сервисе! Подтвердите свой электронный адрес.',
-        message=f'Чтобы подтвердить регистрацию в нашем сервисе перейдите по ссылке: http://{current_site}/activate/{token}',
+        subject=f'Здравствуйте {user.first_name}! Теперь вы зарегистрированы на нашем сервисе! '
+                f'Подтвердите свой электронный адрес.',
+        message=f'Чтобы подтвердить регистрацию в нашем сервисе '
+                f'перейдите по ссылке: http://{current_site}/activate/{token}',
         from_email=EMAIL_HOST_USER,
         recipient_list=[user.email],
         fail_silently=False,

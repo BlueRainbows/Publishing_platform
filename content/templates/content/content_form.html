@@ -8,19 +8,20 @@
                 <div class="card mb-3 mt-4 box-shadow">
                     <div class="card-header text-center">
                         {% if object %}
-                            <h4 class="my-0 font-weight-normal">Изменение поста</h4>
+                        <h4 class="my-0 font-weight-normal">Изменение поста</h4>
                         {% else %}
-                            <h4 class="my-0 font-weight-normal">Cоздайте свой пост</h4>
+                        <h4 class="my-0 font-weight-normal">Cоздайте свой пост</h4>
                         {% endif %}
                     </div>
                     <div class="card-body">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <button type="submit" class="btn d-grid gap-2 col-5 mx-auto btn-block" style="background-color: #ccb5eb">
+                        <button type="submit" class="btn d-grid gap-2 col-5 mx-auto btn-block"
+                                style="background-color: #ccb5eb">
                             {% if object %}
-                                Редактировать
+                            Редактировать
                             {% else %}
-                                Cоздать
+                            Cоздать
                             {% endif %}
                         </button>
                     </div>

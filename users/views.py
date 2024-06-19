@@ -1,20 +1,21 @@
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, PasswordResetCompleteView, PasswordResetConfirmView, \
-    PasswordResetDoneView, PasswordResetView
+from django.contrib.auth import views
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, UpdateView, DeleteView, DetailView, TemplateView
+from django.views import generic
 
 from users.forms import UserProfileForm, UserRegisterForm, UserLoginForm
 from users.models import User, Subscription
 from users.services import create_price, create_session, create_product, get_verification
 
 
+@login_required(login_url=reverse_lazy('users:login'))
 def get_subscription(request):
     """
     Функция для создания сессии подписки.
@@ -23,8 +24,6 @@ def get_subscription(request):
     Редирект на страницу платежа.
      """
     if request.method == 'GET':
-        if not request.user.is_authenticated:
-            raise PermissionDenied
         if request.user.subscription:
             raise PermissionDenied
         else:
@@ -41,7 +40,7 @@ def get_subscription(request):
             return HttpResponsePermanentRedirect(sub.payment_url)
 
 
-class RegisterView(CreateView):
+class RegisterView(generic.CreateView):
     """
     Контроллер для регистрации пользователя.
     Модель User, форма UserRegisterForm.
@@ -62,7 +61,7 @@ class RegisterView(CreateView):
         return super().form_valid(form)
 
 
-class ProfileView(LoginRequiredMixin, DetailView):
+class ProfileView(LoginRequiredMixin, generic.DetailView):
     """
     Контроллер профиля пользователя.
     Модель User.
@@ -77,7 +76,7 @@ class ProfileView(LoginRequiredMixin, DetailView):
         return self.request.user
 
 
-class UserLoginView(LoginView):
+class UserLoginView(views.LoginView):
     """
     Контроллер для авторизации пользователя.
     """
@@ -87,7 +86,7 @@ class UserLoginView(LoginView):
     success_url = reverse_lazy('content:index')
 
 
-class ChangeProfileView(LoginRequiredMixin, UpdateView):
+class ChangeProfileView(LoginRequiredMixin, generic.UpdateView):
     """
     Контроллер для изменения профиля пользователя.
     Модель User, форма UserRegisterForm.
@@ -105,7 +104,7 @@ class ChangeProfileView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
 
-class UserDeleteView(LoginRequiredMixin, DeleteView):
+class UserDeleteView(LoginRequiredMixin, generic.DeleteView):
     """
     Контроллер для удаления пользователя.
     """
@@ -119,7 +118,7 @@ class UserDeleteView(LoginRequiredMixin, DeleteView):
         return self.request.user
 
 
-class VerificationView(TemplateView):
+class VerificationView(generic.TemplateView):
     """
     Контроллер перенаправляющий на уведомление о верификации через почту.
     """
@@ -145,7 +144,7 @@ def activate(request, token):
         return redirect(reverse('users:error_activate'))
 
 
-class UserPasswordResetView(PasswordResetView):
+class UserPasswordResetView(views.PasswordResetView):
     """
     Контроллер для востановления пароля.
     Принимает почту пользователя.
@@ -157,14 +156,14 @@ class UserPasswordResetView(PasswordResetView):
     success_url = reverse_lazy('users:password_reset_done')
 
 
-class UserPasswordResetDoneView(PasswordResetDoneView):
+class UserPasswordResetDoneView(views.PasswordResetDoneView):
     """
     Контроллер перенаправляющий на уведомление о отправке сообщения на почту для изменении пароля.
     """
     template_name = 'users/password_reset_done.html'
 
 
-class UserPasswordResetConfirmView(PasswordResetConfirmView):
+class UserPasswordResetConfirmView(views.PasswordResetConfirmView):
     """
     Контроллер для востановления пароля.
     Принимает почту для востановления пароля, переопределяет новый пароль.
@@ -174,7 +173,7 @@ class UserPasswordResetConfirmView(PasswordResetConfirmView):
     success_url = reverse_lazy('users:password_reset_complete')
 
 
-class UserPasswordResetCompleteView(PasswordResetCompleteView):
+class UserPasswordResetCompleteView(views.PasswordResetCompleteView):
     """
     Контроллер перенаправляющий на уведомление о успешном изменении пароля.
     """

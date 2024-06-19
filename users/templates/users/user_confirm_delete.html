@@ -4,27 +4,27 @@
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
-                <div class="card mb-3 mt-4 box-shadow">
-                    <div class="card-header text-center">
-                        <h4 class="my-0 font-weight-normal">Действительно хотите удалить свой профиль?</h4>
-                    </div>
-                    <div class="card-body">
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="bth-group text-center ">
-                                <button type="submit" class="btn btn-success active">
-                                    Удалить
-                                </button>
-                                <div class="btn-group">
-                                    <a href="{% url 'content:index' %}" class="btn btn-danger active"
-                                       aria-current="page">
-                                       Отмена
-                                    </a>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+            <div class="card mb-3 mt-4 box-shadow">
+                <div class="card-header text-center">
+                    <h4 class="my-0 font-weight-normal">Действительно хотите удалить свой профиль?</h4>
                 </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="bth-group text-center ">
+                            <button type="submit" class="btn btn-success active">
+                                Удалить
+                            </button>
+                            <div class="btn-group">
+                                <a href="{% url 'content:index' %}" class="btn btn-danger active"
+                                   aria-current="page">
+                                    Отмена
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
         <div class="col-3"></div>
     </div>

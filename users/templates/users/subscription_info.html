@@ -14,7 +14,9 @@
     </svg>
 
     <div class="alert alert-success d-flex align-items-center" role="alert">
-        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:">
+            <use xlink:href="#check-circle-fill"/>
+        </svg>
         <div>
             <p class="h2">
                 <em>Подписка оплачена</em>
@@ -22,7 +24,8 @@
         </div>
     </div>
     <div class="d-grid gap-2">
-        <a class="btn btn-outline-success" type="button" href="{% url 'content:index' %}">Вернуться на главную страницу</a>
+        <a class="btn btn-outline-success" type="button" href="{% url 'content:index' %}">Вернуться на главную
+            страницу</a>
     </div>
 </div>
 {% endblock %}
