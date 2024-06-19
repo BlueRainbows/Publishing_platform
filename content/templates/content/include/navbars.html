@@ -24,7 +24,9 @@
                       </form>
                     </li>
                     <li><a class="dropdown-item" href="{% url 'users:profile' %}">Посмотреть профиль</a></li>
+                    {% if user.is_superuser or user.subscription %}
                     <li><a class="dropdown-item" href="{% url 'content:statistics' %}">Проверить статистику</a></li>
+                    {% endif %}
                 {% else %}
                     <li>
                       <a class="dropdown-item" href="{% url 'users:login' %}">Войти в профиль</a>
@@ -38,9 +40,8 @@
                 Пост
               </a>
               <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Информация о размещении контента</a></li>
                   <li><a class="dropdown-item" href="{% url 'content:create' %}">Создать новый пост</a></li>
-                  {% if user.is_authenticated %}
+                  {% if user.is_superuser or user.subscription %}
                     <li><a class="dropdown-item" href="{% url 'content:personal_list' %}">Посмотреть мои посты</a></li>
                   {% endif %}
               </ul>
@@ -61,8 +62,11 @@
                             <div class="modal-body">
                                 Чтобы преобрести подписку, вам <u>необходимо зарегистрироваться</u> на нашей платформе.
                                 Подписка <u>преобретается единоразово</u>, в подписку входит расширенный функционал, такой как:<br>
-                                ♥ Статистика ваших постов <br>
-                                ♥ Просмотр понравившихся постов <br>
+                                ♥ Выкладывать посты без ограничений<br>
+                                ♥ Статистика ваших постов<br>
+                                ♥ Возможность оставлять комментарии и лайки<br>
+                                <br>
+                                Стоймость подписки - 2000 рублей.
                             </div>
                             <div class="modal-footer">
                                 {% if user.is_authenticated %}
@@ -72,7 +76,7 @@
                                     <a class="btn d-grid gap-2 col-5 mx-auto btn-block" style="background-color: #ccb5eb" href="{% url 'users:subscription' %}">Преобрести</a>
                                     {% endif  %}
                                 {% else %}
-                                    <a class="btn d-grid gap-2 col-5 mx-auto btn-block" style="background-color: #ccb5eb" href="{% url 'users:register' %}">Преобрести</a>
+                                    <a class="btn d-grid gap-2 col-5 mx-auto btn-block" style="background-color: #ccb5eb" href="{% url 'users:register' %}">Зарегистрироваться</a>
                                 {% endif %}
                             </div>
                         </div>

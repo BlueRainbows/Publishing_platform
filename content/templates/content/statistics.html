@@ -8,10 +8,9 @@
         <div class="col-10">
             <div class="card mb-3 mt-4 box-shadow">
                 <div class="container text-center">
-
-                    <div class="card text-center">
-                        <div class="card-header">
-                            <h1 class="display-6">Статистика постов:</h1>
+                    <div class="card text-center mt-4">
+                        <div>
+                            <a href="{% url 'content:index' %}" class="btn mt-4" style="background-color: #e2c6f7">Вернуться к постам</a>
                         </div>
                         <div class="card-body">
                             <em>Всего вы выложили постов: {{ post_all }}</em>
@@ -33,28 +32,30 @@
                     <div class="row align-items-start mt-4 mb-4">
                         <br>
                         <div class="col">
-                                <div class="card">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item"><strong>{{post_views.title|truncatechars:50}}</strong></li>
-                                        <li class="list-group-item"><em>{{post_views.text|truncatechars:50}}</em></li>
-                                        <li class="list-group-item">Количество просмотров: {{post_views.views}}</li>
-                                    </ul>
-                                </div>
-                                <br>
-                                <img class="img-thumbnail rounded mx-auto d-block" style="max-width: 70%"
-                                src="{{ post_views.image | mymedia }}">
+                            <div class="card">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><strong>{{post_views.title|truncatechars:50}}</strong>
+                                    </li>
+                                    <li class="list-group-item"><em>{{post_views.text|truncatechars:50}}</em></li>
+                                    <li class="list-group-item">Количество просмотров: {{post_views.views}}</li>
+                                </ul>
+                            </div>
+                            <br>
+                            <img class="img-thumbnail rounded mx-auto d-block" style="max-width: 70%"
+                                 src="{{ post_views.image | mymedia }}">
                         </div>
                         <div class="col">
-                                <div class="card">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item"><strong>{{post_likes.title|truncatechars:50}}</strong></li>
-                                        <li class="list-group-item"><em>{{post_likes.text|truncatechars:100}}</em></li>
-                                        <li class="list-group-item">Количество просмотров: {{post_likes.views}}</li>
-                                    </ul>
-                                </div>
-                                <br>
-                                <img class="img-thumbnail rounded mx-auto d-block" style="max-width: 70%"
-                                src="{{ post_likes.image | mymedia }}">
+                            <div class="card">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><strong>{{post_likes.title|truncatechars:50}}</strong>
+                                    </li>
+                                    <li class="list-group-item"><em>{{post_likes.text|truncatechars:50}}</em></li>
+                                    <li class="list-group-item">Количество лайков: {{like_post}}</li>
+                                </ul>
+                            </div>
+                            <br>
+                            <img class="img-thumbnail rounded mx-auto d-block" style="max-width: 70%"
+                                 src="{{ post_likes.image | mymedia }}">
                         </div>
                     </div>
                 </div>

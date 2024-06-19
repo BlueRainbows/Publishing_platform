@@ -13,16 +13,16 @@
         </symbol>
     </svg>
 
-    <div class="alert alert-success d-flex align-items-center" role="alert">
-        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#check-circle-fill"/></svg>
         <div>
             <p class="h2">
-                <em>Ваш пароль успешно изменен, вы можете вернуться на страницу входа</em>
+                <em>Статистика не доступна, создайте пост чтобы мы сделали подсчёт</em>
             </p>
         </div>
     </div>
     <div class="d-grid gap-2">
-        <a class="btn btn-outline-success" type="button" href="{% url 'users:login' %}">Вернуться на страницу входа</a>
+        <a class="btn btn-outline-danger" type="button" href="{% url 'content:index' %}">Вернуться на главную страницу</a>
     </div>
 </div>
 {% endblock %}

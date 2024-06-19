@@ -14,6 +14,11 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     # Регистрация пользователя
     path('register/', views.RegisterView.as_view(), name='register'),
+    path('verification/', views.VerificationView.as_view(), name='verification'),
+    path('activate/<str:token>/', views.activate, name='activate'),
+    path('activate/success', TemplateView.as_view(template_name='users/activation_success.html'),
+         name='success_activate'),
+    path('activate/error', TemplateView.as_view(template_name='users/activation_error.html'), name='error_activate'),
     # Профиль пользователя
     path('profile/', views.ProfileView.as_view(), name='profile'),
     # Изменение профиля пользователя
@@ -25,4 +30,9 @@ urlpatterns = [
     # Подтверждение подписки
     path('subscription_info/', TemplateView.as_view(template_name='users/subscription_info.html'),
          name='subscription_info'),
+    # изменение пароля
+    path('password_reset/', views.UserPasswordResetView.as_view(), name='password_reset'),
+    path('password_reset_done/', views.UserPasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('password_reset/<uidb64>/<token>/', views.UserPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('password_reset_complete/', views.UserPasswordResetCompleteView.as_view(), name='password_reset_complete')
 ]

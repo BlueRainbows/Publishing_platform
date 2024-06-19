@@ -153,3 +153,20 @@ SECRET_KEY_STRIPE = os.getenv('SECRET_KEY_STRIPE')
 
 # Адрес перехода при успешной оплате в страйпе
 HTTP_SUCCESS = os.getenv('HTTP_SUCCESS')
+
+# Настройки подключения к почтовым рассылкам
+
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
+
+EMAIL_USE_SSL = bool(os.getenv('EMAIL_USE_SSL'))
+
+# Почта с которой приизводиться рассылка
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+# Сгенирированный пароль
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+
+EMAIL_SERVER = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER

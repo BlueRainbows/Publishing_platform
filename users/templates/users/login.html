@@ -16,9 +16,12 @@
                             {{ form.as_p }}
                             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                 <button class="btn btn-success me-md-2" type="submit">Войти</button>
+                                <a href="{% url 'users:password_reset' %}" class="btn btn-danger" type="button">Восстановить
+                                    пароль</a>
                             </div>
-                             <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-2">
-                                 <p><a href="{% url 'users:register' %}" class="link-secondary">Зарегистрироваться</a></p>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-2">
+                                <p><a href="{% url 'users:register' %}" class="link-secondary">Зарегистрироваться</a>
+                                </p>
                             </div>
                         </div>
                     </div>

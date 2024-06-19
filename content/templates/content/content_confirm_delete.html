@@ -20,9 +20,15 @@
                                     Удалить
                                 </button>
                                 <div class="btn-group">
+                                    {% if object.user.pk == user.pk %}
                                     <a href="{% url 'content:personal_list' %}" class="btn btn-danger active"
                                        aria-current="page">
                                         Отмена </a>
+                                    {% else %}
+                                    <a href="{% url 'content:manager_list' %}" class="btn btn-danger active"
+                                       aria-current="page">
+                                        Отмена </a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </form>

@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
@@ -25,28 +26,36 @@ def get_search_content(request):
                           {'search_content_text': search_content_text})
 
 
+@login_required(login_url=reverse_lazy('users:login'))
 def get_statistics(request):
     """
     Функция для подсчёта статистики постов пользователя.
     Возвращает словарь с объектами статистики.
-    """
-    # Получаем количество всех постов пользователя
-    post_all = Content.objects.filter(user=request.user).count()
-    # Получаем пост с самым высоким колличеством просмотров
-    filter_views = Content.objects.filter(user=request.user).order_by('-views').first()
-    # Получаем пост с самым большим колличеством лайков
-    pk_post = 0
-    count_likes = 0
-    content_filter = Content.objects.filter(user=request.user)
-    for content_pk in content_filter:
-        like_filter = LikeCount.objects.filter(content__pk=content_pk.pk).count()
-        if count_likes <= like_filter:
-            count_likes = like_filter
-            pk_post = content_pk.pk
-    max_likes = Content.objects.get(pk=pk_post)
+    # """
+    if request.user.is_superuser or request.user.subscription:
+        if not Content.objects.filter(user=request.user).exists():
+            return render(request, 'content/not_statistics.html')
+        # Получаем количество всех постов пользователя
+        post_all = Content.objects.filter(user=request.user).count()
+        # Получаем пост с самым высоким колличеством просмотров
+        filter_views = Content.objects.filter(user=request.user).order_by('-views').first()
+        # Получаем пост с самым большим колличеством лайков
+        pk_post = 0
+        count_likes = 0
+        content_filter = Content.objects.filter(user=request.user)
+        for content_pk in content_filter:
+            like_filter = LikeCount.objects.filter(content__pk=content_pk.pk).count()
+            if count_likes <= like_filter:
+                count_likes = like_filter
+                pk_post = content_pk.pk
+        max_likes = Content.objects.get(pk=pk_post)
+        like_post = LikeCount.objects.filter(content__pk=max_likes.pk).count()
 
-    return render(request, 'content/statistics.html',
-                  {'post_all': post_all, 'post_views': filter_views, 'post_likes': max_likes})
+        return render(request, 'content/statistics.html',
+                      {'post_all': post_all, 'post_views': filter_views, 'post_likes': max_likes,
+                       'like_post': like_post})
+    elif not request.user.subscription:
+        raise PermissionDenied
 
 
 class ContentCreateView(generic.CreateView):
@@ -69,9 +78,10 @@ class ContentCreateView(generic.CreateView):
         if form.is_valid():
             new_content = form.save(commit=False)
             if self.request.user.is_authenticated:
-                new_content.user = self.request.user
-                new_content.publish = True
-                new_content.save()
+                if self.request.user.subscription or self.request.user.is_superuser:
+                    new_content.user = self.request.user
+                    new_content.publish = True
+                    new_content.save()
             else:
                 new_content.save()
         return super().form_valid(form)
@@ -102,11 +112,10 @@ class ContentDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['like'] = LikeCount.objects.filter(content__pk=self.object.pk).count()
         context['comments'] = Comment.objects.filter(content__pk=self.object.pk)
-
         return context
 
 
-class ContentManagerListView(generic.ListView):
+class ContentManagerListView(LoginRequiredMixin, generic.ListView):
     """
     Контроллер для страницы менеджеров.
     Примимает модель Content.
@@ -130,7 +139,7 @@ class ContentManagerListView(generic.ListView):
             return queryset
 
 
-class ContentPersonalListView(generic.ListView):
+class ContentPersonalListView(LoginRequiredMixin, generic.ListView):
     """
     Контроллер для страницы личных постов.
     Примимает модель Content.
@@ -191,7 +200,7 @@ class ContentUpdateView(LoginRequiredMixin, generic.UpdateView):
         elif self.request.user.has_perm('content.change_publish'):
             return ManagerContentForm
         else:
-            return ContentForm
+            raise PermissionDenied
 
     def get_success_url(self):
         """
@@ -203,7 +212,8 @@ class ContentUpdateView(LoginRequiredMixin, generic.UpdateView):
         """
         if self.request.user == self.get_object().user:
             return reverse('content:personal_list')
-        elif self.request.user.has_perm('content.change_publish'):
+        elif (self.request.user.has_perm('content.change_publish')
+              or self.request.user.is_superuser):
             return reverse('content:manager_list')
 
 
@@ -222,10 +232,13 @@ class ContentDeleteView(LoginRequiredMixin, generic.DeleteView):
         Или не авторизовался в системе.
         """
         self.object = super().get_object(queryset)
-        if not self.request.user.is_authenticated or self.request.user != self.object.user:
+        if self.request.user.is_superuser or self.request.user == self.object.user:
+            return self.object
+        elif self.request.user != self.object.user:
             raise PermissionDenied
 
 
+@login_required(login_url=reverse_lazy('users:login'))
 def likes(request, pk):
     """
     Функция для добавления или удаление лайков.
@@ -237,29 +250,32 @@ def likes(request, pk):
     Если пользователь еще не добавил лайк, то добавляет его.
     Перенаправляет на главную страницу.
     """
-    if not request.user.is_authenticated:
+    if request.user.subscription or request.user.has_perm('content.change_publish'):
+        filter_like = LikeCount.objects.filter(content__pk=pk, user__pk=request.user.pk).exists()
+        if filter_like:
+            LikeCount.objects.filter(content__pk=pk).filter(user__pk=request.user.pk).delete()
+        else:
+            LikeCount.objects.create(user=request.user, content=Content.objects.get(pk=pk))
+        return redirect(reverse('content:index'))
+    elif not request.user.subscription:
         raise PermissionDenied
-    filter_like = LikeCount.objects.filter(content__pk=pk, user__pk=request.user.pk).exists()
-    if filter_like:
-        LikeCount.objects.filter(content__pk=pk).filter(user__pk=request.user.pk).delete()
-    else:
-        LikeCount.objects.create(user=request.user, content=Content.objects.get(pk=pk))
-    return redirect(reverse('content:index'))
 
 
+@login_required(login_url=reverse_lazy('users:login'))
 def comments(request, pk):
     """"
     Функция для добавления комментариев в базу данных.
     Доступна только для авторизованных пользователей.
     Принимает текст комментария и создает модель Comment.
     """
-    if not request.user.is_authenticated:
+    if request.user.is_superuser or request.user.subscription:
+        if request.method == "POST":
+            comment = request.POST.get("comment", None)
+            Comment.objects.create(
+                user=request.user,
+                content=Content.objects.get(pk=pk),
+                comment=comment
+            )
+            return redirect(reverse('content:detail', kwargs={'pk': pk}))
+    elif not request.user.subscription:
         raise PermissionDenied
-    if request.method == "POST":
-        comment = request.POST.get("comment", None)
-        Comment.objects.create(
-            user=request.user,
-            content=Content.objects.get(pk=pk),
-            comment=comment
-        )
-        return redirect(reverse('content:detail', kwargs={'pk': pk}))

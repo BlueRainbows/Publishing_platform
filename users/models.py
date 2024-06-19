@@ -56,6 +56,12 @@ class User(AbstractUser):
         blank=True,
         null=True
     )
+    token = models.CharField(
+        max_length=100,
+        verbose_name='Токен',
+        blank=True,
+        null=True
+    )
 
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = []
@@ -66,6 +72,3 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-
-
-
