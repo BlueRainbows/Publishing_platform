@@ -23,7 +23,6 @@
 **coverage run --source='.' manage.py test**<br>
 **coverage report**
 
-
 <br>Сборка докера<br>
 
 **docker-compose build**<br>
